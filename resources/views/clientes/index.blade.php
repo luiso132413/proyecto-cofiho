@@ -29,7 +29,6 @@
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
-                        <th>Tipo de cliente</th>
                         <th>DPI</th>
                         <th>NIT</th>
                         <th>Teléfono</th>
@@ -162,9 +161,42 @@
             margin-bottom: 18px
         }
 
-        .cl-table {
-            min-width: 1100px
+        .cl-panel .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e5eaf2;
+            border-radius: 12px;
         }
+
+        .cl-table {
+            width: 100%;
+            min-width: 1250px;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        .cl-table thead { background: #f1f5f9; }
+        .cl-table th, .cl-table td {
+            box-sizing: border-box;
+            padding: 15px 13px;
+            text-align: left;
+            border-bottom: 1px solid #e9eef5;
+        }
+        .cl-table tbody tr:last-child td { border-bottom: 0; }
+        .cl-table tbody tr:hover { background: #f8fbff; }
+        .cl-table th:first-child, .cl-table td:first-child { width: 55px; }
+        .cl-table th:nth-child(2), .cl-table td:nth-child(2) { min-width: 165px; }
+        .cl-table th:nth-child(3), .cl-table td:nth-child(3) { min-width: 125px; }
+        .cl-table th:nth-child(4), .cl-table td:nth-child(4) { min-width: 105px; }
+        .cl-table th:nth-child(5), .cl-table td:nth-child(5) { min-width: 115px; }
+        .cl-table th:nth-child(6), .cl-table td:nth-child(6) { min-width: 190px; }
+        .cl-table th:nth-child(7), .cl-table td:nth-child(7) { min-width: 190px; max-width: 260px; overflow-wrap: anywhere; }
+        .cl-table th:nth-child(8), .cl-table td:nth-child(8) { min-width: 100px; }
+        .cl-table th:nth-child(9), .cl-table td:nth-child(9) { min-width: 215px; }
+        .cl-table .cl-actions { justify-content: flex-start; }
+        .cl-table .cl-actions form { display: inline-flex; }
+        .cl-table .cl-action { justify-content: center; min-height: 34px; }
+        
 
         .cl-table th {
             font-size: 11px;
