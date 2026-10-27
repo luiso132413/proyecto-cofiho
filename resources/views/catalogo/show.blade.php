@@ -42,7 +42,8 @@
 
         .panel {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            align-items: start;
             background: white;
             border: 1px solid #e2e8f0;
             border-radius: 20px;
@@ -52,13 +53,16 @@
 
         .visual {
             background: linear-gradient(145deg, #dce8f9, #adc9ef);
-            min-height: 360px;
+            height: 460px;
+            min-height: 0;
             display: grid;
             place-items: center;
             color: #5379af
         }
 
-        .visual img { width: 100%; height: 100%; min-height: 360px; object-fit: cover; display: block; }
+        .visual img { width: 100%; height: 100%; min-height: 0; object-fit: contain; display: block; }
+        .public-form[hidden] { display: none !important; }
+        .details { min-width: 0; }
         .visual svg {
             width: 170px;
             height: 170px
@@ -131,7 +135,8 @@
             }
 
             .visual {
-                min-height: 240px
+                height: 300px;
+                min-height: 0
             }
 
             .details {
@@ -256,7 +261,7 @@
     <script>
         const abrirReserva = document.getElementById('abrir-reserva');
         const opcionesReserva = document.getElementById('opciones-reserva');
-        if (opcionesReserva) abrirReserva.addEventListener('click', () => {
+        if (opcionesReserva && abrirReserva) abrirReserva.addEventListener('click', () => {
             const abrir = opcionesReserva.hidden;
             opcionesReserva.hidden = !abrir;
             abrirReserva.setAttribute('aria-expanded', String(abrir));
@@ -273,8 +278,11 @@
             });
         });
         @if($errors->any())
-            if (document.getElementById('form-registro-publico')) document.getElementById('form-registro-publico').hidden = false;
-            document.getElementById('abrir-reserva').setAttribute('aria-expanded', 'true');
+            const formNuevo = document.getElementById('form-registro-publico');
+            const formExistente = document.getElementById('form-cliente-existente');
+            if (formNuevo) formNuevo.hidden = false;
+            if (formExistente) formExistente.hidden = true;
+            if (abrirReserva) abrirReserva.setAttribute('aria-expanded', 'true');
         @endif
     </script>
 </body>

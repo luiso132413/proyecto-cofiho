@@ -133,6 +133,11 @@
             margin-top: 22px
         }
 
+        .rv-pagination { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:18px; }
+        .rv-page-buttons { display:flex; gap:6px; flex-wrap:wrap; }
+        .rv-page-buttons button { padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff; color:#334155; cursor:pointer; font-weight:650; }
+        .rv-page-buttons button[aria-current="page"] { background:#2563eb; border-color:#2563eb; color:white; }
+        .rv-page-buttons button:disabled { opacity:.45; cursor:not-allowed; }
         .rv-scroll {
             overflow-x: auto
         }
@@ -391,6 +396,10 @@
                 </tbody>
             </table>
         </div>
+        <nav class="rv-pagination" id="rvPaginacion" aria-label="Paginación de reservas">
+            <span class="rv-muted" id="rvResumenPaginas"></span>
+            <div class="rv-page-buttons" id="rvBotonesPaginas"></div>
+        </nav>
     </section>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -477,11 +486,50 @@
             fifoModelo.addEventListener('change', update);
             update();
             const buscar = document.getElementById('rvBuscar');
-            buscar.addEventListener('input', () => {
-                const term = buscar.value.toLocaleLowerCase();
-                document.querySelectorAll('#rvTabla tbody tr').forEach(row => row.hidden = !row.textContent
-                    .toLocaleLowerCase().includes(term));
-            });
+            // Paginación y búsqueda sobre todas las reservas cargadas.
+            const filas = [...document.querySelectorAll('#rvTabla tbody tr')].filter(row => row.querySelector('a.rv-link'));
+            const resumen = document.getElementById('rvResumenPaginas');
+            const botones = document.getElementById('rvBotonesPaginas');
+            const paginacion = document.getElementById('rvPaginacion');
+            const porPagina = 15;
+            let paginaActual = 1;
+
+            function pintarPagina() {
+                const termino = buscar.value.trim().toLocaleLowerCase();
+                const coincidentes = filas.filter(row => row.textContent.toLocaleLowerCase().includes(termino));
+                const total = coincidentes.length;
+                const paginas = Math.max(1, Math.ceil(total / porPagina));
+                paginaActual = Math.min(Math.max(1, paginaActual), paginas);
+                filas.forEach(row => row.hidden = true);
+                coincidentes.slice((paginaActual - 1) * porPagina, paginaActual * porPagina)
+                    .forEach(row => row.hidden = false);
+                const inicio = total ? (paginaActual - 1) * porPagina + 1 : 0;
+                const fin = Math.min(paginaActual * porPagina, total);
+                resumen.textContent = total ? `Mostrando ${inicio}–${fin} de ${total} reservas` : 'No se encontraron reservas';
+                botones.replaceChildren();
+                paginacion.hidden = filas.length === 0;
+
+                function agregarBoton(etiqueta, pagina, deshabilitado = false, actual = false) {
+                    const boton = document.createElement('button');
+                    boton.type = 'button';
+                    boton.textContent = etiqueta;
+                    boton.disabled = deshabilitado;
+                    if (actual) boton.setAttribute('aria-current', 'page');
+                    boton.addEventListener('click', () => {
+                        paginaActual = pagina;
+                        pintarPagina();
+                        document.getElementById('rvTabla').scrollIntoView({behavior:'smooth', block:'start'});
+                    });
+                    botones.appendChild(boton);
+                }
+                agregarBoton('Anterior', paginaActual - 1, paginaActual === 1);
+                for (let p = Math.max(1, paginaActual - 2); p <= Math.min(paginas, paginaActual + 2); p++) {
+                    agregarBoton(String(p), p, false, p === paginaActual);
+                }
+                agregarBoton('Siguiente', paginaActual + 1, paginaActual === paginas);
+            }
+            buscar.addEventListener('input', () => { paginaActual = 1; pintarPagina(); });
+            pintarPagina();
             @if ($errors->any())
                 togglePanel(true);
             @endif

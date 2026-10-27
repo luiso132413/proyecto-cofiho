@@ -197,6 +197,11 @@
             color: #92400e
         }
 
+        .fin-pagination { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:18px; }
+        .fin-pages { display:flex; gap:6px; flex-wrap:wrap; }
+        .fin-page-btn { border:1px solid #dbe3ef; background:white; border-radius:8px; padding:8px 12px; color:#334664; cursor:pointer; font-weight:700; }
+        .fin-page-btn.active { background:#2563eb; color:white; border-color:#2563eb; }
+        .fin-page-btn:disabled { opacity:.45; cursor:not-allowed; }
         .fin-count {
             color: #71809a;
             font-size: 12px;
@@ -383,26 +388,68 @@
                     </tbody>
                 </table>
             </div>
+            <div class="fin-pagination" id="paginacionFinanzas" hidden>
+                <span class="fin-count" id="rangoFinanzas"></span>
+                <nav class="fin-pages" id="botonesFinanzas" aria-label="Páginas de transacciones"></nav>
+            </div>
         </div>
     </div>
     <script>
+        const finPorPagina = 15;
+        let finPagina = 1;
+        let finFiltradas = [];
+
+        function pintarPaginaFinanzas() {
+            const total = finFiltradas.length;
+            const paginas = Math.max(1, Math.ceil(total / finPorPagina));
+            finPagina = Math.min(Math.max(1, finPagina), paginas);
+            const inicio = (finPagina - 1) * finPorPagina;
+            const visibles = new Set(finFiltradas.slice(inicio, inicio + finPorPagina));
+            document.querySelectorAll('#tablaFinanzas .fila-finanza').forEach(fila => {
+                fila.style.display = visibles.has(fila) ? '' : 'none';
+            });
+            document.getElementById('contadorFinanzas').textContent = 'Resultados encontrados: ' + total;
+            const vacio = document.getElementById('sinResultadosFinanzas');
+            if (vacio) vacio.style.display = total ? 'none' : '';
+            const panel = document.getElementById('paginacionFinanzas');
+            panel.hidden = total <= finPorPagina;
+            document.getElementById('rangoFinanzas').textContent = total
+                ? `Mostrando ${inicio + 1}–${Math.min(inicio + finPorPagina, total)} de ${total}`
+                : 'Sin resultados';
+            const nav = document.getElementById('botonesFinanzas');
+            nav.replaceChildren();
+            const agregar = (texto, pagina, deshabilitado, activo = false) => {
+                const boton = document.createElement('button');
+                boton.type = 'button';
+                boton.className = 'fin-page-btn' + (activo ? ' active' : '');
+                boton.textContent = texto;
+                boton.disabled = deshabilitado;
+                if (activo) boton.setAttribute('aria-current', 'page');
+                boton.addEventListener('click', () => {
+                    finPagina = pagina;
+                    pintarPaginaFinanzas();
+                });
+                nav.appendChild(boton);
+            };
+            agregar('Anterior', finPagina - 1, finPagina === 1);
+            const desde = Math.max(1, Math.min(finPagina - 2, paginas - 4));
+            const hasta = Math.min(paginas, desde + 4);
+            for (let i = desde; i <= hasta; i++) agregar(String(i), i, false, i === finPagina);
+            agregar('Siguiente', finPagina + 1, finPagina === paginas);
+        }
+
         function filtrarFinanzas() {
             const buscar = document.getElementById('buscarFinanza').value.trim().toLowerCase();
             const tipo = document.getElementById('filtroTipo').value;
             const estado = document.getElementById('filtroEstado').value;
-            let visibles = 0;
-            document.querySelectorAll('#tablaFinanzas .fila-finanza').forEach(fila => {
-                const coincideBusqueda = !buscar || [fila.dataset.transaccion, fila.dataset.venta, fila.dataset
-                    .reserva
-                ].some(valor => (valor || '').toLowerCase().includes(buscar));
-                const mostrar = coincideBusqueda && (!tipo || fila.dataset.tipo === tipo) && (!estado || fila
-                    .dataset.estado === estado);
-                fila.style.display = mostrar ? '' : 'none';
-                if (mostrar) visibles++;
+            finFiltradas = [...document.querySelectorAll('#tablaFinanzas .fila-finanza')].filter(fila => {
+                const coincideBusqueda = !buscar || [fila.dataset.transaccion, fila.dataset.venta,
+                    fila.dataset.reserva].some(valor => (valor || '').toLowerCase().includes(buscar));
+                return coincideBusqueda && (!tipo || fila.dataset.tipo === tipo) &&
+                    (!estado || fila.dataset.estado === estado);
             });
-            document.getElementById('contadorFinanzas').textContent = 'Mostrando ' + visibles + ' transacciones';
-            const vacio = document.getElementById('sinResultadosFinanzas');
-            if (vacio) vacio.style.display = visibles ? 'none' : '';
+            finPagina = 1;
+            pintarPaginaFinanzas();
         }
 
         function limpiarFiltrosFinanzas() {
@@ -411,5 +458,6 @@
             document.getElementById('filtroEstado').value = '';
             filtrarFinanzas();
         }
+        document.addEventListener('DOMContentLoaded', filtrarFinanzas);
     </script>
 @endsection
