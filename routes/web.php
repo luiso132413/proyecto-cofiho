@@ -15,14 +15,14 @@ use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CatalogoController;
+use App\Http\Controllers\ReservaPublicaController;
 
 // Inicio
 // Route::get('/', function () {
 //     return redirect()->route(auth()->check() ? 'dashboard' : 'login');
 // });
 
-Route::get('/', [CatalogoController::class, 'index'])
-    ->name('catalogo');
+Route::get('/', [CatalogoController::class, 'index'])->name('catalogo');
 
 // Rutas protegidas
 Route::middleware('auth')->group(function () {
@@ -246,6 +246,21 @@ Route::get('/catalogo', [CatalogoController::class, 'index'])
 Route::get('/catalogo/{id}', [CatalogoController::class, 'show'])
     ->whereNumber('id')
     ->name('catalogo.show');
+
+Route::post('/catalogo/{id}/cliente', [ReservaPublicaController::class, 'registrarCliente'])
+    ->whereNumber('id')
+    ->middleware('throttle:5,10')
+    ->name('catalogo.reserva.cliente');
+
+Route::post('/catalogo/{id}/identificar', [ReservaPublicaController::class, 'identificarCliente'])
+    ->whereNumber('id')->middleware('throttle:5,10')->name('catalogo.reserva.identificar');
+
+Route::post('/catalogo/{id}/confirmar', [ReservaPublicaController::class, 'confirmar'])
+    ->whereNumber('id')->middleware('throttle:3,10')->name('catalogo.reserva.confirmar');
+
+Route::get('/reserva-publica/confirmada/{id}', [ReservaPublicaController::class, 'confirmada'])
+    ->whereNumber('id')
+    ->name('catalogo.reserva.confirmada');
 
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Vehiculo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CatalogoController extends Controller
 {
@@ -30,10 +31,18 @@ class CatalogoController extends Controller
         return view('catalogo.index', compact('vehiculos'));
     }
 
-    public function show(int $id)
+    public function show(Request $request, int $id)
     {
         $vehiculo = $this->disponibles()->where('id_vehiculo', $id)->firstOrFail();
         $inventarioActual = $vehiculo->inventarios->whereNull('fecha_salida')->sortByDesc('id_inventario')->first();
-        return view('catalogo.show', compact('vehiculo', 'inventarioActual'));
+        $clientePublico = null;
+        if ((int) $request->session()->get('reserva_publica.vehiculo_id') === $id
+            && $request->session()->has('reserva_publica.cliente_id')) {
+            $clientePublico = DB::connection('oracle')->table('CLIENTE')
+                ->where('ID_CLIENTE', (int) $request->session()->get('reserva_publica.cliente_id'))
+                ->where('ACTIVO', 1)
+                ->first(['ID_CLIENTE', 'NOMBRE', 'APELLIDO']);
+        }
+        return view('catalogo.show', compact('vehiculo', 'inventarioActual', 'clientePublico'));
     }
 }

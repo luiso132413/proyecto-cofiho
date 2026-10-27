@@ -110,6 +110,21 @@
             line-height: 1.6
         }
 
+        .reserve-panel { margin-top: 24px; padding: 24px; background: #f8fafc; border: 1px solid #dbe5f2; border-radius: 14px; }
+        .reserve-panel h2 { margin: 0 0 8px; font-size: 20px; }
+        .reserve-panel p { color: #64748b; line-height: 1.6; font-size: 14px; }
+        .reserve-toggle { background: #2563eb; border: 0; border-radius: 9px; color: white; padding: 12px 18px; font-weight: 700; cursor: pointer; }
+        .reserve-options { margin-top: 16px; padding-top: 16px; border-top: 1px solid #dbe5f2; }
+        .reserve-options[hidden] { display: none; }
+        .reserve-choice { display: block; width: 100%; text-align: left; background: white; border: 1px solid #dbe5f2; border-radius: 9px; padding: 14px; margin: 10px 0; font: inherit; color: #14233e; cursor: pointer; }
+        .reserve-choice:hover { border-color: #2563eb; }
+        .reserve-info { font-size: 13px; color: #64748b; }
+        .public-form { margin-top: 14px; display: grid; gap: 12px; }
+        .public-form label { display: grid; gap: 5px; font-size: 13px; font-weight: 650; }
+        .public-form input { width: 100%; padding: 11px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+        .public-form button { background: #2563eb; color: white; padding: 12px; border: 0; border-radius: 9px; font-weight: 700; cursor: pointer; }
+        .public-alert { padding: 12px; border-radius: 8px; background: #eff6ff; color: #1e40af; margin: 12px 0; font-size: 13px; }
+        .public-errors { background: #fef2f2; color: #991b1b; }
         @media(max-width:750px) {
             .panel {
                 grid-template-columns: 1fr
@@ -179,11 +194,89 @@
                         <dd>Disponible</dd>
                     </div>
                 </dl>
-                <p class="notice">Esta es una página pública de consulta. La disponibilidad y el precio final deben
-                    confirmarse con la concesionaria. No se realizan reservas ni pagos desde este sitio.</p>
+                <p class="notice">Disponibilidad y precio sujetos a confirmación. No se reciben pagos en el catálogo.</p>
+                <div class="reserve-panel">
+                    <h2>¿Quieres reservar este vehículo?</h2>
+                    <p>Podrás solicitar una reserva sin pago, con vigencia de 15 minutos una vez confirmada.</p>
+                    @unless($clientePublico)
+                    <button class="reserve-toggle" type="button" id="abrir-reserva" aria-expanded="false" aria-controls="opciones-reserva">Quiero reservar</button>
+                    @endunless
+                    @if(session('registro_publico_ok'))
+                        <p class="public-alert" role="status">{{ session('registro_publico_ok') }}</p>
+                    @endif
+                    @if($errors->any())
+                        <div class="public-alert public-errors" role="alert">
+                            <strong>Revisa los datos:</strong>
+                            <ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+                        </div>
+                    @endif
+                    @if($clientePublico)
+                        <div class="public-alert" role="status" style="margin-top:16px">
+                            <strong>Cliente identificado (demostración)</strong>
+                            <p style="margin:8px 0">Cliente: {{ $clientePublico->nombre }} {{ $clientePublico->apellido }}</p>
+                            <p style="margin:8px 0">Vehículo: {{ $vehiculo->modelo?->marca?->nombre }} {{ $vehiculo->modelo?->nombre }} {{ $vehiculo->anio }}</p>
+                            <p style="margin:8px 0">Enganche: Q 0.00 · Vigencia prevista: 15 minutos desde la confirmación.</p>
+                            <p style="margin:8px 0">Al confirmar, se solicitará la reserva a Oracle. No se requiere pago.</p>
+                            <form method="POST" action="{{ route('catalogo.reserva.confirmar', $vehiculo->id_vehiculo) }}" style="margin-top:14px">@csrf
+                                <button class="reserve-toggle" type="submit">Confirmar reserva sin pago</button>
+                            </form>
+                        </div>
+                    @else
+                    <div class="reserve-options" id="opciones-reserva" {{ $errors->any() ? '' : 'hidden' }}>
+                        <strong>¿Ya eres cliente de COFIHO?</strong>
+                        <button class="reserve-choice" type="button" data-tipo="nuevo">Soy cliente nuevo</button>
+                        <button class="reserve-choice" type="button" data-tipo="existente">Ya estoy registrado</button>
+                        <p class="reserve-info" id="mensaje-reserva" role="status">Selecciona una opción para continuar.</p>
+                        <form id="form-registro-publico" class="public-form" method="POST" action="{{ route('catalogo.reserva.cliente', $vehiculo->id_vehiculo) }}" hidden>
+                            @csrf
+                            <label>Nombre *<input name="nombre" maxlength="100" required value="{{ old('nombre') }}" autocomplete="given-name"></label>
+                            <label>Apellido *<input name="apellido" maxlength="100" required value="{{ old('apellido') }}" autocomplete="family-name"></label>
+                            <label>DPI (13 dígitos) *<input name="dpi" inputmode="numeric" pattern="[0-9]{13}" maxlength="13" required autocomplete="off"></label>
+                            <label>NIT (opcional)<input name="nit" maxlength="20" value="{{ old('nit') }}"></label>
+                            <label>Correo electrónico *<input type="email" name="email" maxlength="150" required value="{{ old('email') }}" autocomplete="email"></label>
+                            <label>Teléfono *<input name="telefono" maxlength="20" required value="{{ old('telefono') }}" autocomplete="tel"></label>
+                            <label>Dirección (opcional)<input name="direccion" maxlength="255" value="{{ old('direccion') }}" autocomplete="street-address"></label>
+                            <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Sitio web<input name="sitio_web" tabindex="-1" autocomplete="off"></label></div>
+                            <p class="reserve-info">Al registrarte podrás confirmar una reserva de demostración. No se realiza ningún cobro.</p>
+                            <button type="submit">Registrar mis datos</button>
+                        </form>
+                        <form id="form-cliente-existente" class="public-form" method="POST" action="{{ route('catalogo.reserva.identificar', $vehiculo->id_vehiculo) }}" hidden>
+                            @csrf
+                            <label>DPI registrado *<input name="dpi" inputmode="numeric" pattern="[0-9]{13}" maxlength="13" required autocomplete="off"></label>
+                            <label>Correo registrado *<input type="email" name="email" maxlength="150" required autocomplete="email"></label>
+                            <p class="reserve-info">Acceso solo para demostración universitaria; estos datos no verifican realmente la identidad.</p>
+                            <button type="submit">Continuar con mi registro</button>
+                        </form>
+                    </div>
+                    @endif
+                </div>
             </section>
         </div>
     </main>
+    <script>
+        const abrirReserva = document.getElementById('abrir-reserva');
+        const opcionesReserva = document.getElementById('opciones-reserva');
+        if (opcionesReserva) abrirReserva.addEventListener('click', () => {
+            const abrir = opcionesReserva.hidden;
+            opcionesReserva.hidden = !abrir;
+            abrirReserva.setAttribute('aria-expanded', String(abrir));
+        });
+        document.querySelectorAll('[data-tipo]').forEach(boton => {
+            boton.addEventListener('click', () => {
+                const form = document.getElementById('form-registro-publico');
+                if (form) form.hidden = boton.dataset.tipo !== 'nuevo';
+                const existente = document.getElementById('form-cliente-existente');
+                if (existente) existente.hidden = boton.dataset.tipo !== 'existente';
+                document.getElementById('mensaje-reserva').textContent = boton.dataset.tipo === 'nuevo'
+                    ? 'Completa tus datos para registrarte.'
+                    : 'Introduce el DPI y correo registrados (solo demostración).';
+            });
+        });
+        @if($errors->any())
+            if (document.getElementById('form-registro-publico')) document.getElementById('form-registro-publico').hidden = false;
+            document.getElementById('abrir-reserva').setAttribute('aria-expanded', 'true');
+        @endif
+    </script>
 </body>
 
 </html>
