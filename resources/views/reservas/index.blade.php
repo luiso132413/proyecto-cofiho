@@ -133,6 +133,14 @@
             margin-top: 22px
         }
 
+
+        .rv-filter-panel { display:grid; grid-template-columns:minmax(220px,320px) auto; justify-content:start; gap:12px; align-items:end; padding:18px; background:#f7f9fd; border:1px solid #e2e8f0; border-radius:12px; margin:16px 0 20px; }
+        .rv-filter-panel .rv-field { min-width:0; }
+        .rv-filter-panel .rv-field input,.rv-filter-panel .rv-field select { min-height:42px; }
+        .rv-filter-clear { min-height:42px; white-space:nowrap; }
+        .rv-filter-count { font-size:12px; color:#64748b; margin:0 0 12px; }
+        @media(max-width:1100px) { .rv-filter-panel { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media(max-width:600px) { .rv-filter-panel { grid-template-columns:1fr; } }
         .rv-pagination { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:18px; }
         .rv-page-buttons { display:flex; gap:6px; flex-wrap:wrap; }
         .rv-page-buttons button { padding:8px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff; color:#334155; cursor:pointer; font-weight:650; }
@@ -359,9 +367,21 @@
                 <h2 style="margin:0 0 5px">Reservas registradas</h2>
                 <p class="rv-muted" style="margin:0">Historial y estado actual de las operaciones.</p>
             </div>
-            <div class="rv-field"><label for="rvBuscar">Buscar reserva</label><input type="search" id="rvBuscar"
-                    placeholder="ID, cliente, vehículo, estado..."></div>
         </div>
+        <div class="rv-filter-panel" role="search" aria-label="Filtro de reservas">
+            <div class="rv-field">
+                <label for="rvFiltroEstado">Filtrar por estado</label>
+                <select id="rvFiltroEstado">
+                    <option value="">Todos los estados</option>
+                    <option value="COMPLETADA">Completada</option>
+                    <option value="PENDIENTE">Pendiente</option>
+                    <option value="CANCELADA">Cancelada</option>
+                    <option value="EXPIRADA">Expirada</option>
+                </select>
+            </div>
+            <button type="button" class="rv-secondary rv-filter-clear" id="rvLimpiarFiltros">Limpiar filtro</button>
+        </div>
+        <p class="rv-filter-count" id="rvFiltroResumen" aria-live="polite"></p>
         <div class="rv-scroll">
             <table class="rv-table" id="rvTabla">
                 <thead>
@@ -376,7 +396,7 @@
                 </thead>
                 <tbody>
                     @forelse($reservas as $reserva)
-                        <tr>
+                        <tr data-estado="{{ strtoupper(trim($reserva->estado ?? '')) }}" data-fecha="{{ substr((string) ($reserva->fecha_reserva ?? ''), 0, 10) }}">
                             <td><strong>#{{ $reserva->id_reserva }}</strong></td>
                             <td>{{ trim(($reserva->cliente_nombre ?? '') . ' ' . ($reserva->cliente_apellido ?? '')) }}</td>
                             <td>
@@ -485,8 +505,7 @@
             fifoPredio.addEventListener('change', update);
             fifoModelo.addEventListener('change', update);
             update();
-            const buscar = document.getElementById('rvBuscar');
-            // Paginación y búsqueda sobre todas las reservas cargadas.
+            // Paginación y filtro por estado sobre todas las reservas cargadas.
             const filas = [...document.querySelectorAll('#rvTabla tbody tr')].filter(row => row.querySelector('a.rv-link'));
             const resumen = document.getElementById('rvResumenPaginas');
             const botones = document.getElementById('rvBotonesPaginas');
@@ -495,8 +514,9 @@
             let paginaActual = 1;
 
             function pintarPagina() {
-                const termino = buscar.value.trim().toLocaleLowerCase();
-                const coincidentes = filas.filter(row => row.textContent.toLocaleLowerCase().includes(termino));
+                const estado = document.getElementById('rvFiltroEstado').value;
+                const coincidentes = filas.filter(row => !estado || row.dataset.estado === estado);
+                document.getElementById('rvFiltroResumen').textContent = `${coincidentes.length} de ${filas.length} reservas coinciden con los filtros`;
                 const total = coincidentes.length;
                 const paginas = Math.max(1, Math.ceil(total / porPagina));
                 paginaActual = Math.min(Math.max(1, paginaActual), paginas);
@@ -528,7 +548,12 @@
                 }
                 agregarBoton('Siguiente', paginaActual + 1, paginaActual === paginas);
             }
-            buscar.addEventListener('input', () => { paginaActual = 1; pintarPagina(); });
+            const refrescarFiltros = () => { paginaActual = 1; pintarPagina(); };
+            document.getElementById('rvFiltroEstado').addEventListener('change', refrescarFiltros);
+            document.getElementById('rvLimpiarFiltros').addEventListener('click', () => {
+                document.getElementById('rvFiltroEstado').value = '';
+                refrescarFiltros();
+            });
             pintarPagina();
             @if ($errors->any())
                 togglePanel(true);
