@@ -17,9 +17,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CatalogoController;
 
 // Inicio
-Route::get('/', function () {
-    return redirect()->route(auth()->check() ? 'dashboard' : 'login');
-});
+// Route::get('/', function () {
+//     return redirect()->route(auth()->check() ? 'dashboard' : 'login');
+// });
+
+Route::get('/', [CatalogoController::class, 'index'])
+    ->name('catalogo');
 
 // Rutas protegidas
 Route::middleware('auth')->group(function () {

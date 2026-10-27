@@ -214,6 +214,22 @@
                 flex-direction: column
             }
 
+            .acceso-admin {
+    color: #94a3b8 !important;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 10px;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.acceso-admin:hover {
+    color: #ffffff !important;
+    border-color: #64748b;
+    background: rgba(255, 255, 255, 0.06);
+}
+
         }
     </style>
 </head>
@@ -221,10 +237,15 @@
 <body>
     <header class="nav"><a href="{{ route('catalogo.index') }}" class="logo">COFIHO <span
                 style="color:#60a5fa">V2</span><br><small>Catálogo automotriz</small></a><a href="#vehiculos">Explorar
-            vehículos</a></header>
+            vehículos</a>
+            <a href="{{ route('login') }}" class="acceso-admin">
+    &#128274; Acceso administrativo
+</a>
+    </header>
     <section class="hero"><small>CONOCE NUESTRO INVENTARIO</small>
         <h1>Encuentra el vehículo ideal para ti</h1>
         <p>Explora vehículos nuevos y usados disponibles en nuestras instalaciones.</p>
+        
     </section>
     <main class="wrap" id="vehiculos">
         <h2>Vehículos disponibles</h2>
