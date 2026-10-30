@@ -273,7 +273,13 @@
             $porPredio = $vehiculos->groupBy('id_predio')->map(fn($items) => $items->count())->sortKeys();
             $etiquetas = $porPredio->keys()->map(fn($id) => ($predios->get($id)->nombre ?? 'Predio ' . $id))->values();
             $cantidades = $porPredio->values();
-            $ordenados = $vehiculos->sortBy('orden_fifo');
+            // FIFO global visual: fecha de ingreso más antigua primero, sin separar por predio.
+             $ordenados = $vehiculos->sort(function ($a, $b) {
+                 $fechaA = strtotime((string) $a->fecha_ingreso);
+                 $fechaB = strtotime((string) $b->fecha_ingreso);
+                 return ($fechaA <=> $fechaB)
+                     ?: ((int) $a->id_vehiculo <=> (int) $b->id_vehiculo);
+             })->values();
         @endphp
 
             <div class="report-stat-grid">
@@ -299,7 +305,7 @@
             </div>
             <div class="card report-card">
                 <h2>Detalle de inventario FIFO</h2>
-                <p class="report-sub">El orden FIFO se presenta tal como lo calcula la vista Oracle.</p>
+                <p class="report-sub">Prioridad global por fecha de ingreso, del vehículo más antiguo al más reciente, sin separar por predio.</p>
                 <div class="report-filter">
                     <div><label for="fifoBuscar">Buscar vehículo</label><input id="fifoBuscar"
                             placeholder="VIN, marca, modelo o ID"></div>
@@ -331,10 +337,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($ordenados as $v)
+                            @forelse($ordenados as $posicion => $v)
                                 <tr data-search="{{ strtolower($v->vin . ' ' . $v->id_vehiculo . ' ' . ($detallesVehiculos->get($v->id_vehiculo)['marca'] ?? '') . ' ' . ($detallesVehiculos->get($v->id_vehiculo)['modelo'] ?? '')) }}"
                                     data-estado="{{ strtoupper($v->estado) }}" data-predio="{{ $v->id_predio }}">
-                                    <td><strong>{{ $v->orden_fifo }}</strong></td>
+                                    <td><strong>{{ $posicion + 1 }}</strong></td>
                                     <td>{{ $v->id_inventario }}</td>
                                     <td>{{ $predios->get($v->id_predio)->nombre ?? 'Predio ' . $v->id_predio }}</td>
                                     <td><strong>{{ ($detallesVehiculos->get($v->id_vehiculo)['marca'] ?? '') . ' ' . ($detallesVehiculos->get($v->id_vehiculo)['modelo'] ?? '') }}</strong>

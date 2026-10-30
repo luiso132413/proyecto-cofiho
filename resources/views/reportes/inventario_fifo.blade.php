@@ -228,7 +228,11 @@
         $porPredio = $vehiculos->groupBy('id_predio')->map(fn($items) => $items->count())->sortKeys();
         $etiquetas = $porPredio->keys()->map(fn($id) => 'Predio ' . $id)->values();
         $cantidades = $porPredio->values();
-        $ordenados = $vehiculos->sortBy('orden_fifo');
+        $ordenados = $vehiculos->sort(function ($a, $b) {
+            $fechaA = strtotime((string) $a->fecha_ingreso);
+            $fechaB = strtotime((string) $b->fecha_ingreso);
+            return ($fechaA <=> $fechaB) ?: ((int) $a->id_vehiculo <=> (int) $b->id_vehiculo);
+        })->values();
     @endphp
     <div class="report-head">
         <div>
@@ -258,7 +262,7 @@
     </div>
     <div class="card report-card">
         <h2>Detalle de inventario FIFO</h2>
-        <p class="report-sub">El orden FIFO se presenta tal como lo calcula la vista Oracle.</p>
+        <p class="report-sub">Orden global por fecha de ingreso, sin separar los vehículos por predio.</p>
         <div class="report-filter">
             <div><label for="fifoBuscar">Buscar vehículo</label><input id="fifoBuscar" placeholder="VIN o ID de vehículo">
             </div>
@@ -287,10 +291,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($ordenados as $v)
+                    @forelse($ordenados as $posicion => $v)
                         <tr data-search="{{ strtolower($v->vin . ' ' . $v->id_vehiculo) }}"
                             data-estado="{{ strtoupper($v->estado) }}">
-                            <td><strong>{{ $v->orden_fifo }}</strong></td>
+                            <td><strong>{{ $posicion + 1 }}</strong></td>
                             <td>{{ $v->id_inventario }}</td>
                             <td>{{ $v->id_predio }}</td>
                             <td>{{ $v->id_vehiculo }}</td>

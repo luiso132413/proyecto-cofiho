@@ -52,7 +52,32 @@ SQL);
 
     public function index(Request $request)
     {
-        $vehiculos = $this->disponibles()->orderBy('id_vehiculo', 'desc')->get();
+        // Oracle determina el orden FIFO a partir del ingreso vigente al predio.
+        // Se consulta por separado para evitar referencias correlacionadas
+        // incompatibles con el alias generado por Eloquent/Oracle.
+        $idsFIFO = DB::connection('oracle')
+    ->table('INVENTARIO_PREDIO')
+    ->select('ID_VEHICULO')
+    ->selectRaw('MIN(FECHA_INGRESO) AS FECHA_FIFO')
+    ->whereNull('FECHA_SALIDA')
+    ->groupBy('ID_VEHICULO')
+    ->orderBy('FECHA_FIFO', 'asc')
+    ->orderBy('ID_VEHICULO', 'asc')
+    ->get()
+    ->map(function ($fila) {
+        $datos = array_change_key_case(
+            (array) $fila,
+            CASE_LOWER
+        );
+
+        return (int) $datos['id_vehiculo'];
+    });
+
+        $posicionesFIFO = $idsFIFO->flip()->all();
+
+        $vehiculos = $this->disponibles()->get()
+            ->sortBy(fn ($v) => $posicionesFIFO[(string) $v->id_vehiculo] ?? PHP_INT_MAX)
+            ->values();
         $vehiculos = $vehiculos->filter(function ($v) use ($request) {
             $marca = (string) ($v->modelo?->marca?->nombre ?? '');
             $modelo = (string) ($v->modelo?->nombre ?? '');

@@ -96,9 +96,18 @@ class ReporteController extends Controller
         $detallesVehiculos = $descripciones;
 
         if ($vista === 'fifo') {
-            $vehiculos = $oracle->table('V_INVENTARIO_FIFO')->get();
-            return view('reportes.inventario', compact('vista', 'vehiculos', 'predios', 'detallesVehiculos'));
-        }
+    $vehiculos = $oracle->table('V_INVENTARIO_FIFO')
+        ->orderBy('FECHA_INGRESO', 'asc')
+        ->orderBy('ID_VEHICULO', 'asc')
+        ->get();
+
+    return view('reportes.inventario', compact(
+        'vista',
+        'vehiculos',
+        'predios',
+        'detallesVehiculos'
+    ));
+}
 
         $inventario = $oracle->table('V_REPORTE_ANTIGUEDAD')->get();
         $resumenPredios = $inventario->groupBy('id_predio')->map(function ($items, $idPredio) use ($nombresPredios) {
@@ -270,14 +279,16 @@ class ReporteController extends Controller
             'desde', 'hasta', 'buscar'));
     }
 
-    public function inventarioFIFO()
-    {
-        $vehiculos = DB::connection('oracle')
-            ->table('V_INVENTARIO_FIFO')
-            ->get();
+   public function inventarioFIFO()
+{
+    $vehiculos = DB::connection('oracle')
+        ->table('V_INVENTARIO_FIFO')
+        ->orderBy('FECHA_INGRESO', 'asc')
+        ->orderBy('ID_VEHICULO', 'asc')
+        ->get();
 
-        return view('reportes.inventario_fifo', compact('vehiculos'));
-    }
+    return view('reportes.inventario_fifo', compact('vehiculos'));
+}
 
     public function conciliacionFinanciera()
     {
