@@ -1,0 +1,464 @@
+/* COFIHO V2 — Halloween (versión sutil, para panel admin y página pública).
+   Solo visual: no toca formularios, tablas ni datos. Todo cuelga de body.hw-on,
+   así que al apagar el interruptor vuelve el diseño original.
+   body.hw-admin  = layout con .sidebar/.topbar (app.blade.php)
+   body.hw-public = página con .nav/.hero (catálogo)                                  */
+
+:root{
+  --hw-night:#0b0713; --hw-card:#150d26; --hw-line:#3a2a5a;
+  --hw-pumpkin:#ff7a1a; --hw-ember:#ffb347; --hw-bone:#efe6d2; --hw-mist:#a99cc4;
+  --hw-violet:#6d28d9; --hw-violet-dark:#5b21b6;
+}
+.hw-deco{pointer-events:none}
+.hw-deco[hidden]{display:none!important}
+
+/* =====================================================================
+   A. PANEL ADMIN  (fondo claro: solo se retinta el color de acento)
+   ===================================================================== */
+body.hw-on.hw-admin{background:#f6f3fa}
+
+/* Barra lateral: de azul marino a ciruela nocturna, activo en calabaza */
+body.hw-on.hw-admin .sidebar{background:linear-gradient(180deg,#1d1236 0%,#120b24 100%);border-right-color:#33224f;box-shadow:5px 0 28px #1a0b3a1a}
+body.hw-on.hw-admin .brand{border-bottom-color:#ffffff18}
+body.hw-on.hw-admin .brand-symbol{position:relative;background:linear-gradient(135deg,#ff9a3c,#e8620c);box-shadow:0 8px 20px #e8620c40}
+/* tallito de calabaza sobre el logo */
+body.hw-on.hw-admin .brand-symbol::before{content:"";position:absolute;top:-5px;left:50%;width:6px;height:8px;margin-left:-3px;border-radius:2px 2px 0 0;background:#4d7a2a}
+body.hw-on.hw-admin .brand-word em{color:var(--hw-ember)}
+body.hw-on.hw-admin .brand-word small,
+body.hw-on.hw-admin .menu-caption{color:#9a8bb8}
+body.hw-on.hw-admin .menu a{color:#d3c9e8}
+body.hw-on.hw-admin .menu a:hover{background:#ffffff12;color:#fff}
+body.hw-on.hw-admin .menu a.active{background:linear-gradient(95deg,#f97316,#c2410c);box-shadow:0 7px 18px #c2410c40;color:#fff}
+body.hw-on.hw-admin .sidebar-footer{border-top-color:#ffffff18}
+body.hw-on.hw-admin .user-avatar{background:#4a2f7a;color:#efe6ff}
+body.hw-on.hw-admin .user-role{color:#a99cc4}
+
+/* Barra superior: aquí vive la única "escena" (araña y murciélagos) */
+body.hw-on.hw-admin .topbar{position:relative;overflow:hidden;border-bottom-color:#e7dff2;box-shadow:0 2px 14px #3b1d6a0a}
+body.hw-on.hw-admin .topbar::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:linear-gradient(90deg,#f97316,#a855f7 55%,transparent)}
+body.hw-admin .topbar > .page-heading,
+body.hw-admin .topbar > .system,
+.halloween-toggle.in-topbar{position:relative;z-index:2}
+body.hw-on.hw-admin .heading-kicker{color:#9a86b8}
+body.hw-on.hw-admin .system{background:#f8f4fc;border-color:#eadff5}
+body.hw-on.hw-admin .system-dot{background:var(--hw-pumpkin);box-shadow:0 0 0 4px #ffedd5}
+
+/* Contenido: mismas tarjetas y tablas, solo tonos más cálidos/violeta */
+body.hw-on.hw-admin .card{border-color:#ebe4f3;box-shadow:0 8px 30px #2a14500d}
+body.hw-on.hw-admin th{background:#f5f0fa;color:#5f4d80}
+body.hw-on.hw-admin td{border-bottom-color:#efe9f6}
+body.hw-on.hw-admin tr:hover td{background:#faf7fd}
+body.hw-on.hw-admin .stat{background:#f5f0fa}
+body.hw-on.hw-admin .filtros{background:#faf7fd;border-color:#ebe4f3}
+
+/* Botón principal en violeta. NO se tocan .btn-secundario ni .btn-peligro:
+   el rojo de eliminar debe seguir siendo inequívoco. */
+body.hw-on.hw-admin .btn:not(.btn-secundario):not(.btn-peligro){background:var(--hw-violet);box-shadow:0 3px 10px #6d28d91f}
+body.hw-on.hw-admin .btn:not(.btn-secundario):not(.btn-peligro):hover{background:var(--hw-violet-dark)}
+
+body.hw-on.hw-admin .form-group input:focus,
+body.hw-on.hw-admin .form-group select:focus,
+body.hw-on.hw-admin .form-group textarea:focus,
+body.hw-on.hw-admin .filtros input:focus,
+body.hw-on.hw-admin .filtros select:focus{border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,.15)}
+
+/* Decoración de la barra superior */
+body.hw-admin .hw-web{width:84px;color:#7c5cbf;opacity:.4;z-index:1}
+body.hw-admin .hw-spider{right:430px;width:26px}
+body.hw-admin .hw-bat{opacity:.7}
+body.hw-admin .hw-bat svg{fill:#2a1745}
+body.hw-admin .hw-bat.b1{top:14px;width:26px;animation-duration:32s;animation-delay:-9s}
+body.hw-admin .hw-bat.b2{top:54px;width:18px;animation-duration:46s;animation-delay:-28s}
+
+/* =====================================================================
+   B. PÁGINA PÚBLICA  (tema nocturno, pero sin niebla ni viñeta)
+   ===================================================================== */
+body.hw-on.hw-public{background:var(--hw-night);color:var(--hw-bone)}
+
+body.hw-on.hw-public .nav{background:rgba(11,7,19,.94);border-bottom:1px solid var(--hw-line);box-shadow:0 12px 40px rgba(255,122,26,.07)}
+body.hw-on.hw-public .logo{font-weight:800;letter-spacing:.02em}
+body.hw-on.hw-public .logo span{color:var(--hw-pumpkin)!important}
+body.hw-on.hw-public .logo small{color:var(--hw-mist)}
+body.hw-on.hw-public .nav a:last-child{color:#c9b8ee}
+body.hw-on.hw-public .acceso-admin{color:#c9b8ee!important;border:1px solid #4a3470;border-radius:8px;padding:8px 12px;font-size:12px}
+body.hw-on.hw-public .acceso-admin:hover{border-color:var(--hw-pumpkin);color:#fff!important}
+
+body.hw-on.hw-public .hero{
+  position:relative;overflow:hidden;padding:80px 24px 130px;
+  background:
+    radial-gradient(1.5px 1.5px at 8% 22%,#fff,transparent),
+    radial-gradient(1px 1px at 17% 58%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 29% 14%,#fff,transparent),
+    radial-gradient(1px 1px at 41% 40%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 63% 18%,#fff,transparent),
+    radial-gradient(1px 1px at 74% 52%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 88% 30%,#fff,transparent),
+    radial-gradient(1px 1px at 95% 66%,#fff,transparent),
+    linear-gradient(180deg,#100822 0%,#2a0f4a 52%,#6b2358 82%,#c2410c 118%);
+}
+body.hw-on.hw-public .hero > :not(.hw-deco){position:relative;z-index:2}
+body.hw-on.hw-public .hero small{color:var(--hw-ember)}
+body.hw-on.hw-public .hero p{color:#e6d9f5}
+body.hw-on.hw-public .hero h1{color:var(--hw-bone);text-shadow:0 0 20px rgba(255,122,26,.4),0 3px 0 rgba(0,0,0,.3)}
+
+body.hw-on.hw-public .wrap h2{color:var(--hw-ember)}
+body.hw-on.hw-public .muted{color:var(--hw-mist)}
+body.hw-on.hw-public .filters{background:rgba(255,255,255,.04);border-color:var(--hw-line)}
+body.hw-on.hw-public .filters input,
+body.hw-on.hw-public .filters select{background:#140c24;color:var(--hw-bone);border-color:var(--hw-line)}
+body.hw-on.hw-public .filters input::placeholder{color:#8f82ad}
+body.hw-on.hw-public .filters input:focus,
+body.hw-on.hw-public .filters select:focus{outline:none;border-color:var(--hw-pumpkin);box-shadow:0 0 0 3px rgba(255,122,26,.25)}
+body.hw-on.hw-public .filters select option{background:#140c24;color:var(--hw-bone)}
+body.hw-on.hw-public .filters a{color:var(--hw-ember)}
+
+body.hw-on.hw-public .btn{background:linear-gradient(135deg,#ff7a1a,#c2410c);color:#1a0b00;transition:box-shadow .2s}
+body.hw-on.hw-public .btn:hover{box-shadow:0 0 18px rgba(255,122,26,.5)}
+body.hw-on.hw-public .btn:focus-visible{outline:3px solid var(--hw-ember);outline-offset:3px}
+
+body.hw-on.hw-public .car{background:var(--hw-card);border-color:var(--hw-line);box-shadow:0 10px 30px rgba(0,0,0,.4);transition:border-color .25s,box-shadow .25s}
+body.hw-on.hw-public .car:hover{border-color:var(--hw-pumpkin);box-shadow:0 0 0 1px rgba(255,122,26,.45),0 14px 36px rgba(255,122,26,.18)}
+body.hw-on.hw-public .visual{background:#1b1233}
+body.hw-on.hw-public .visual img{filter:saturate(.9) brightness(.95)}
+body.hw-on.hw-public .visual::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--hw-card) 0%,rgba(21,13,38,.25) 45%,transparent 70%)}
+body.hw-on.hw-public .tag{background:var(--hw-night);color:var(--hw-ember);border:1px solid var(--hw-ember)}
+body.hw-on.hw-public .info h2{color:var(--hw-bone)}
+body.hw-on.hw-public .meta{color:var(--hw-mist)}
+body.hw-on.hw-public .price{color:var(--hw-ember)}
+body.hw-on.hw-public .empty{background:var(--hw-card);border:1px solid var(--hw-line)}
+body.hw-on.hw-public .footer{background:#07040d;color:#7d6e9b;border-top:1px solid var(--hw-line)}
+
+/* Decoración pública: telarañas, luna, cementerio, calabaza pequeña y 2 murciélagos */
+body.hw-public .hw-web{position:absolute;top:0;z-index:24;width:clamp(80px,11vw,150px);color:#fff;opacity:.35}
+body.hw-public .hw-bat svg{fill:#0a0512}
+body.hw-public .hw-bat.b1{top:18%;width:44px;animation-duration:18s;animation-delay:-5s}
+body.hw-public .hw-bat.b2{top:40%;width:28px;animation-duration:26s;animation-delay:-13s}
+
+.hw-moon{
+  position:absolute;z-index:0;top:14%;right:8%;width:clamp(70px,11vw,140px);aspect-ratio:1;border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 40%,rgba(0,0,0,.08) 0 10%,transparent 11%),
+    radial-gradient(circle at 65% 60%,rgba(0,0,0,.08) 0 14%,transparent 15%),
+    radial-gradient(circle at 55% 25%,rgba(0,0,0,.06) 0 7%,transparent 8%),
+    radial-gradient(circle at 35% 35%,#fffbe8,#f3e7b6 55%,#d9c88a);
+  box-shadow:0 0 50px 14px rgba(255,235,170,.28),0 0 140px 50px rgba(255,200,100,.12);
+}
+.hw-hills{position:absolute;z-index:1;left:0;bottom:-1px;width:100%;height:110px}
+.hw-hills svg{display:block;width:100%;height:100%}
+.hw-pumpkin{position:absolute;z-index:2;left:5%;bottom:6px;width:clamp(44px,5vw,68px)}
+.hw-pumpkin svg{display:block;width:100%;filter:drop-shadow(0 0 12px rgba(255,140,30,.55))}
+
+/* =====================================================================
+   C. ELEMENTOS COMUNES (telaraña, araña, murciélagos)
+   ===================================================================== */
+.hw-web{position:absolute;pointer-events:none}
+.hw-web svg{display:block;width:100%}
+.hw-web.l{left:0}
+.hw-web.r{right:0;transform:scaleX(-1)}
+
+.hw-spider{position:absolute;top:0;z-index:1;animation:hw-dangle 6s ease-in-out infinite alternate}
+.hw-spider svg{display:block;width:100%;overflow:visible}
+.hw-spider::before{content:"";position:absolute;left:50%;bottom:100%;width:1px;height:90px;background:rgba(109,40,217,.35)}
+.sp-legs{fill:none;stroke:#7a5bb5;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.sp-body{fill:#2a1745;stroke:#7a5bb5}
+.sp-eye{fill:#ff3b3b}
+.sp-mark{fill:#ff7a1a}
+@keyframes hw-dangle{from{transform:translateY(14px)}to{transform:translateY(32px)}}
+
+.hw-bat{position:absolute;left:0;z-index:1;animation:hw-fly linear infinite;will-change:transform}
+.hw-bat svg{display:block;width:100%;transform-origin:50% 40%;animation:hw-flap .22s ease-in-out infinite alternate}
+@keyframes hw-fly{from{transform:translate3d(-12vw,0,0)}50%{transform:translate3d(50vw,-16px,0)}to{transform:translate3d(112vw,8px,0)}}
+@keyframes hw-flap{from{transform:scaleY(1)}to{transform:scaleY(.5)}}
+
+/* =====================================================================
+   D. INTERRUPTOR
+   ===================================================================== */
+.halloween-toggle{
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+  border-radius:999px;padding:8px 11px 8px 14px;font:700 12px system-ui,sans-serif;
+}
+.halloween-toggle:focus-visible{outline:3px solid #fbbf24;outline-offset:3px}
+.hw-switch{position:relative;width:32px;height:17px;border-radius:999px;background:#b9acd1;transition:background .2s}
+.hw-switch::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s}
+.halloween-toggle[aria-pressed="true"] .hw-switch{background:var(--hw-pumpkin)}
+.halloween-toggle[aria-pressed="true"] .hw-switch::after{transform:translateX(15px)}
+
+/* En el panel admin va dentro de la barra superior, sin tapar contenido */
+.halloween-toggle.in-topbar{margin-left:auto;border:1px solid #e3d8f0;background:#f8f4fc;color:#4a3470}
+.halloween-toggle.in-topbar:hover{background:#f0e9f9}
+
+/* En la página pública va flotante, abajo a la derecha */
+body.hw-public .halloween-toggle{position:fixed;right:14px;bottom:16px;z-index:30;border:1px solid #f59e0b;background:#14102a;color:#fff;box-shadow:0 6px 22px #0005}
+body.hw-public .halloween-toggle:hover{background:#1f1840}
+body.hw-public .hw-switch{background:#4b4566}
+body.hw-public .halloween-toggle[aria-pressed="true"] .hw-switch{background:var(--hw-pumpkin)}
+
+/* =====================================================================
+   E. MÓVIL, ACCESIBILIDAD E IMPRESIÓN
+   ===================================================================== */
+@media(max-width:1100px){body.hw-admin .hw-spider{display:none}}
+@media(max-width:768px){
+  body.hw-admin .hw-bat{display:none}
+  .halloween-toggle.in-topbar{padding:7px 10px}
+  .halloween-toggle.in-topbar > span:first-child{display:none}
+}
+@media(max-width:600px){
+  body.hw-on.hw-public .hero{padding:60px 18px 110px}
+  .hw-moon{opacity:.55;right:-10px}
+  body.hw-public .hw-bat.b2{display:none}
+  body.hw-public .halloween-toggle{bottom:12px;right:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .hw-deco,.hw-deco *{animation:none!important}
+  .hw-bat{display:none}
+  .hw-spider{transform:translateY(22px)}
+}
+@media print{.hw-deco,.halloween-toggle{display:none!important}}
+/* Páginas de detalle y confirmación: estilos aislados, sin tocar formularios */
+body.hw-on.hw-detail,body.hw-on.hw-confirmation{background:#110b20;color:#efe6d2}
+body.hw-on.hw-detail header,body.hw-on.hw-confirmation header{background:linear-gradient(110deg,#211039,#582350)}
+body.hw-on.hw-detail .panel,body.hw-on.hw-confirmation .panel{background:#1b1230;border-color:#4a3466;color:#efe6d2}
+body.hw-on.hw-detail .details h1,body.hw-on.hw-confirmation h1{color:#ffb347}
+body.hw-on.hw-detail .price,body.hw-on.hw-detail .eyebrow{color:#ffb347}
+body.hw-on.hw-detail .reserve-panel{background:#261a3c;border-color:#4a3466}
+body.hw-on.hw-detail .reserve-panel p,body.hw-on.hw-detail .notice{color:#cbbde0}
+body.hw-on.hw-detail .reserve-choice{background:#fdfbff;color:#14233e}
+body.hw-on.hw-detail .reserve-toggle,body.hw-on.hw-detail .public-form button{background:#b45309}
+body.hw-on.hw-confirmation .section{color:#ffb347}
+body.hw-on.hw-confirmation .details{border-color:#4a3466}
+body.hw-on.hw-confirmation .item{border-bottom-color:#4a3466}
+body.hw-on.hw-confirmation .item span,body.hw-on.hw-confirmation .intro{color:#cbbde0}
+body.hw-on.hw-confirmation .btn{background:#b45309}
+/* Los elementos ocultos de la lógica original deben permanecer ocultos */
+.public-form[hidden],.reserve-options[hidden]{display:none!important}
+
+
+/* ==========================================
+   COFIHO V2 - CORRECCIÓN DETALLE VEHÍCULO
+   ========================================== */
+
+/* Evitar que Halloween tape el contenido */
+body.hw-on.hw-public .panel {
+    position: relative;
+    background: #ffffff;
+    color: #14233e;
+    overflow: hidden;
+}
+
+/* Restaurar imagen del vehículo */
+body.hw-on.hw-public .panel .visual {
+    position: relative;
+    background: #1b1233;
+}
+
+body.hw-on.hw-public .panel .visual::after {
+    display: none !important;
+}
+
+body.hw-on.hw-public .panel .visual img {
+    position: relative;
+    z-index: 1;
+    filter: none;
+}
+
+/* Restaurar información del vehículo */
+body.hw-on.hw-public .panel .details {
+    position: relative;
+    background: #ffffff;
+    color: #14233e;
+}
+
+body.hw-on.hw-public .panel .details h1 {
+    color: #14233e;
+}
+
+body.hw-on.hw-public .panel .details dd {
+    color: #14233e;
+}
+
+body.hw-on.hw-public .panel .details dt {
+    color: #64748b;
+}
+
+/* Restaurar formulario de reserva */
+body.hw-on.hw-public .reserve-panel {
+    position: relative;
+    background: #f8fafc;
+    color: #14233e;
+}
+
+body.hw-on.hw-public .reserve-panel h2 {
+    color: #14233e;
+}
+
+body.hw-on.hw-public .reserve-panel p {
+    color: #64748b;
+}
+
+/* Mantener botones accesibles */
+body.hw-on.hw-public .reserve-toggle,
+body.hw-on.hw-public .reserve-choice,
+body.hw-on.hw-public .public-form button {
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+/* Las decoraciones nunca deben interceptar clics */
+.hw-deco,
+.hw-deco::before,
+.hw-deco::after {
+    pointer-events: none !important;
+}
+
+/* Respetar formularios ocultos */
+.public-form[hidden],
+.reserve-options[hidden] {
+    display: none !important;
+}
+
+
+/* =========================================
+   COFIHO V2 - DETALLE HALLOWEEN ELEGANTE
+   ========================================= */
+
+body.hw-on.hw-public:has(.reserve-panel) {
+    background:
+        radial-gradient(ellipse at 50% 0%, #27113d, transparent 65%),
+        #0b0713;
+}
+
+/* Tarjeta principal */
+body.hw-on.hw-public .panel:has(.reserve-panel) {
+    background: #181125;
+    border: 1px solid #49315e;
+    border-radius: 22px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    align-items: stretch;
+    overflow: hidden;
+}
+
+/* Columna de imagen */
+body.hw-on.hw-public .panel:has(.reserve-panel) .visual {
+    height: auto;
+    min-height: 100%;
+    background: #160e24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Imagen sin deformaciones */
+body.hw-on.hw-public .panel:has(.reserve-panel) .visual img {
+    width: 100%;
+    height: auto;
+    max-height: 650px;
+    object-fit: contain;
+    filter: none;
+}
+
+/* Eliminar superposición */
+body.hw-on.hw-public .panel:has(.reserve-panel) .visual::after {
+    display: none !important;
+}
+
+/* Información del vehículo */
+body.hw-on.hw-public .panel:has(.reserve-panel) .details {
+    background: #21162f;
+    color: #f3eaf9;
+    padding: 36px;
+}
+
+body.hw-on.hw-public .panel:has(.reserve-panel) .details h1 {
+    color: #fff4e5;
+    font-size: 32px;
+}
+
+body.hw-on.hw-public .panel:has(.reserve-panel) .details dt {
+    color: #b9a7ce;
+}
+
+body.hw-on.hw-public .panel:has(.reserve-panel) .details dd {
+    color: #f4eafc;
+}
+
+body.hw-on.hw-public .panel:has(.reserve-panel) .price {
+    color: #ffad4d;
+}
+
+body.hw-on.hw-public .panel:has(.reserve-panel) .notice {
+    color: #c5b6d5;
+}
+
+/* Formulario de reserva */
+body.hw-on.hw-public .reserve-panel {
+    background: #2c1c3d;
+    border: 1px solid #604077;
+    border-radius: 14px;
+    padding: 24px;
+}
+
+body.hw-on.hw-public .reserve-panel h2 {
+    color: #ffbd70;
+}
+
+body.hw-on.hw-public .reserve-panel p {
+    color: #d1c1df;
+}
+
+/* Botón de reserva */
+body.hw-on.hw-public .reserve-toggle,
+body.hw-on.hw-public .public-form button {
+    background: linear-gradient(135deg,#ff922b,#e86612);
+    color: #1e0c06;
+    border: none;
+    font-weight: 800;
+    border-radius: 10px;
+    padding: 13px 20px;
+    cursor: pointer;
+}
+
+/* Opciones de cliente */
+body.hw-on.hw-public .reserve-choice {
+    background: #38254a;
+    border: 1px solid #684780;
+    color: #fff;
+}
+
+body.hw-on.hw-public .reserve-choice:hover {
+    border-color: #ff922b;
+}
+
+/* Campos */
+body.hw-on.hw-public .public-form input {
+    background: #160e24;
+    border: 1px solid #684780;
+    color: #fff;
+}
+
+body.hw-on.hw-public .public-form label,
+body.hw-on.hw-public .reserve-options strong {
+    color: #f3eaf9;
+}
+
+/* Adaptación móvil */
+@media (max-width: 750px) {
+    body.hw-on.hw-public .panel:has(.reserve-panel) {
+        grid-template-columns: 1fr;
+    }
+
+    body.hw-on.hw-public .panel:has(.reserve-panel) .visual {
+        min-height: 0;
+        height: auto;
+        padding: 20px;
+    }
+
+    body.hw-on.hw-public .panel:has(.reserve-panel) .visual img {
+        max-height: 350px;
+    }
+
+    body.hw-on.hw-public .panel:has(.reserve-panel) .details {
+        padding: 24px;
+    }
+}

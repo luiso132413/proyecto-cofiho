@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+
     <title>Detalle del vehículo | COFIHO V2</title>
     <style>
         * {
@@ -144,6 +145,10 @@
             }
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/halloween.css') }}">
 </head>
 
 <body>
@@ -285,6 +290,8 @@
             if (abrirReserva) abrirReserva.setAttribute('aria-expanded', 'true');
         @endif
     </script>
+
+    <script src="{{ asset('js/halloween.js') }}" defer></script>
 </body>
 
 </html>

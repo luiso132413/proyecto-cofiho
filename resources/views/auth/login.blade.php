@@ -29,6 +29,10 @@
         @media(max-width:900px){.shell{grid-template-columns:1fr}.hero{display:none}.right{min-height:100vh;padding:36px 22px}.mobile-brand{display:flex;align-items:center;gap:11px;font-family:Manrope,sans-serif;font-weight:800;color:#122447;margin-bottom:65px}.mobile-brand .brand-mark{width:38px;height:38px}.login-card{max-width:430px}}
         @media(prefers-reduced-motion:reduce){*{transition:none!important}}
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/halloween.css') }}">
 </head>
 <body>
 <main class="shell">
@@ -88,5 +92,7 @@
         button.textContent = 'Ingresando...';
     });
 </script>
+
+    <script src="{{ asset('js/halloween.js') }}" defer></script>
 </body>
 </html>

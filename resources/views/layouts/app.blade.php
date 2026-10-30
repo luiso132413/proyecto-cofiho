@@ -173,6 +173,10 @@ body{font-family:Inter,'Segoe UI',Arial,sans-serif;background:#f5f7fb;color:#182
         .cofiho-alert.is-hiding { opacity:0; transform:translateY(-10px); }
         @media (prefers-reduced-motion:reduce) { .cofiho-alert { transition:none; } }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/halloween.css') }}">
     @stack('styles')
 </head>
 <body>
@@ -370,6 +374,6 @@ body{font-family:Inter,'Segoe UI',Arial,sans-serif;background:#f5f7fb;color:#182
     </script>
     @stack('scripts')
 
-    
+    <script src="{{ asset('js/halloween.js') }}" defer></script>
 </body>
 </html>

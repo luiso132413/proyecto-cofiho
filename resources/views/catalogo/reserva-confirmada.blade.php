@@ -16,6 +16,10 @@
         .btn{display:block;margin-top:24px;background:#2563eb;color:#fff;text-decoration:none;text-align:center;padding:15px 18px;border-radius:10px;font-weight:800}.btn:hover{background:#1d4ed8}
         footer{text-align:center;color:#7b8ba3;font-size:12px;margin-top:22px}@media(max-width:520px){.panel{padding:23px 17px}.item{flex-direction:column;gap:3px}.item strong{text-align:left}h1{font-size:23px}}
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/halloween.css') }}">
 </head>
 <body>
 <header>COFIHO V2 · CATÁLOGO PÚBLICO</header>
@@ -49,6 +53,8 @@
         <a class="btn" href="{{ route('catalogo.index') }}">← Volver al catálogo</a>
     </div>
     <footer>COFIHO V2 · Demostración académica</footer>
+    
 </main>
+<script src="{{ asset('js/halloween.js') }}" defer></script>
 </body>
 </html>
