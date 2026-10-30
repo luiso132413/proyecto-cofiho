@@ -15,13 +15,47 @@ use Throwable;
 
 class VentaController extends Controller
 {
+    /**
+     * RF-04: solo permite comercializar usados con su inspeccion mas reciente
+     * APROBADA y un avaluo APROBADO vinculado a esa misma inspeccion.
+     * Oracle sigue validando definitivamente al procesar la venta.
+     */
+    private function filtrarAptosRF04($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('VEHICULO.CONDICION', 'NUEVO')
+              ->orWhere(function ($usados) {
+                  $usados->where('VEHICULO.CONDICION', 'USADO')
+                      ->whereExists(function ($sub) {
+                          $sub->selectRaw('1')
+                              ->from('INSPECCION as I')
+                              ->whereColumn('I.ID_VEHICULO', 'VEHICULO.ID_VEHICULO')
+                              ->where('I.RESULTADO', 'APROBADA')
+                              ->whereNotExists(function ($posterior) {
+                                  $posterior->selectRaw('1')
+                                      ->from('INSPECCION as I2')
+                                      ->whereColumn('I2.ID_VEHICULO', 'I.ID_VEHICULO')
+                                      ->whereRaw('(I2.FECHA_INSPECCION > I.FECHA_INSPECCION OR (I2.FECHA_INSPECCION = I.FECHA_INSPECCION AND I2.ID_INSPECCION > I.ID_INSPECCION))');
+                              })
+                              ->whereExists(function ($avaluo) {
+                                  $avaluo->selectRaw('1')
+                                      ->from('AVALUO as A')
+                                      ->whereColumn('A.ID_VEHICULO', 'I.ID_VEHICULO')
+                                      ->whereColumn('A.ID_INSPECCION', 'I.ID_INSPECCION')
+                                      ->where('A.ESTADO', 'APROBADO');
+                              });
+                      });
+              });
+        });
+    }
+
     public function index()
     {
         $ventas = Venta::with('detalles')->orderBy('id_venta', 'desc')->get();
         $clientes = Cliente::where('activo', 1)->orderBy('nombre')->orderBy('apellido')->get();
         $clientesHistoricos = Cliente::all()->keyBy('id_cliente');
 
-        $vehiculos = Vehiculo::with('modelo')
+        $vehiculos = $this->filtrarAptosRF04(Vehiculo::with('modelo'))
             ->where('estado', 'DISPONIBLE')
             ->orderBy('id_vehiculo')
             ->get();
@@ -29,7 +63,7 @@ class VentaController extends Controller
         $reservas = Reserva::with('vehiculo.modelo')
             ->whereIn('estado', ['PENDIENTE', 'CONFIRMADA'])
             ->where('fecha_expiracion', '>', DB::raw('SYSDATE'))
-            ->whereHas('vehiculo', fn ($q) => $q->where('estado', 'RESERVADO'))
+            ->whereHas('vehiculo', fn ($q) => $this->filtrarAptosRF04($q)->where('estado', 'RESERVADO'))
             ->orderBy('id_reserva', 'desc')
             ->get();
 

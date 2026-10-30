@@ -14,6 +14,39 @@ class CatalogoController extends Controller
             ->where('estado', 'DISPONIBLE')
             ->whereHas('inventarios', function ($q) {
                 $q->whereNull('fecha_salida')->whereHas('predio');
+            })
+            ->where(function ($q) {
+                $q->where('condicion', 'NUEVO')
+                  ->orWhere(function ($usados) {
+                      $usados->where('condicion', 'USADO')
+                          ->whereRaw(<<<'SQL'
+EXISTS (
+    SELECT 1
+    FROM INSPECCION I
+    WHERE I.ID_VEHICULO = VEHICULO.ID_VEHICULO
+      AND I.RESULTADO = 'APROBADA'
+      AND NOT EXISTS (
+          SELECT 1
+          FROM INSPECCION I2
+          WHERE I2.ID_VEHICULO = I.ID_VEHICULO
+            AND (
+                I2.FECHA_INSPECCION > I.FECHA_INSPECCION
+                OR (
+                    I2.FECHA_INSPECCION = I.FECHA_INSPECCION
+                    AND I2.ID_INSPECCION > I.ID_INSPECCION
+                )
+            )
+      )
+      AND EXISTS (
+          SELECT 1
+          FROM AVALUO A
+          WHERE A.ID_VEHICULO = I.ID_VEHICULO
+            AND A.ID_INSPECCION = I.ID_INSPECCION
+            AND A.ESTADO = 'APROBADO'
+      )
+)
+SQL);
+                  });
             });
     }
 
