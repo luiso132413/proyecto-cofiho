@@ -219,9 +219,19 @@
             line-height: 1.5
         }
 
+        /* Responsive basado en espacio disponible, incluido el menú lateral */
+        .cofi-dashboard { min-width:0; }
+        .cofi-hero-content { min-width:0; }
+        .cofi-actions, .cofi-kpis { min-width:0; }
+        .cofi-action { min-width:0; }
+        .cofi-action-label { min-width:0; overflow-wrap:anywhere; }
+        @media(max-width:1250px) {
+            .cofi-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            .cofi-actions { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        }
         @media(max-width:1050px) {
             .cofi-kpis {
-                grid-template-columns: repeat(3, minmax(0, 1fr))
+                grid-template-columns: repeat(2, minmax(0, 1fr))
             }
         }
 
@@ -259,10 +269,6 @@
             }
         }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/halloween.css') }}">
 @endpush
 @section('content')
     <div class="cofi-dashboard">
@@ -363,5 +369,4 @@
         <div class="cofi-note">Los indicadores muestran los registros generales del sistema, no únicamente los movimientos
             del día.</div>
     </div>
-    <script src="{{ asset('js/halloween.js') }}" defer></script>
 @endsection

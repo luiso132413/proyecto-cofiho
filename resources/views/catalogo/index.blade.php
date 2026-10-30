@@ -235,7 +235,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/halloween.css') }}">
+    <link rel="stylesheet" href="{{ secure_asset('css/halloween.css') }}">
 </head>
 
 <body>
@@ -306,7 +306,7 @@
     </main>
     <footer class="footer">COFIHO V2 · Catálogo de demostración conectado al inventario · Precios sujetos a confirmación
     </footer>
-    <script src="{{ asset('js/halloween.js') }}" defer></script>
+    <script src="{{ secure_asset('js/halloween.js') }}" defer></script>
 </body>
 
 </html>

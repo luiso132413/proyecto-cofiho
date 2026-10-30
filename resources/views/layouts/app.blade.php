@@ -172,11 +172,56 @@ body{font-family:Inter,'Segoe UI',Arial,sans-serif;background:#f5f7fb;color:#182
         .cofiho-alert-close:hover { opacity:1; }
         .cofiho-alert.is-hiding { opacity:0; transform:translateY(-10px); }
         @media (prefers-reduced-motion:reduce) { .cofiho-alert { transition:none; } }
+        /* Adaptación responsive global sin alterar componentes funcionales */
+        html, body { max-width:100%; }
+        .main { min-width:0; }
+        .content, .card, .topbar, .page-heading { min-width:0; }
+        .content img, .card img { max-width:100%; height:auto; }
+        .table-responsive { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        .table-responsive table { min-width:600px; }
+        .charts { grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); }
+        .stats { grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); }
+        .mobile-menu-toggle { display:none; border:1px solid #dbe3ef; background:#fff; color:#14233c; border-radius:10px; width:42px; height:42px; font-size:22px; cursor:pointer; flex-shrink:0; }
+        .mobile-backdrop { display:none; }
+        @media (max-width: 1024px) {
+            .content { padding:22px; }
+            .topbar { padding:18px 22px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { position:fixed; top:0; left:0; width:min(290px,85vw); height:100dvh; z-index:1001; transform:translateX(-105%); transition:transform .25s ease; display:flex; flex-direction:column; }
+            body.mobile-menu-open .sidebar { transform:translateX(0); }
+            .sidebar .menu { display:block; flex:1; overflow-y:auto; padding:20px 12px; }
+            .sidebar .menu a { display:flex; margin-bottom:5px; }
+            .sidebar .sidebar-footer { flex-shrink:0; }
+            .mobile-menu-toggle { display:grid; place-items:center; }
+            .mobile-backdrop { position:fixed; inset:0; background:rgba(8,17,35,.55); z-index:1000; }
+            body.mobile-menu-open .mobile-backdrop { display:block; }
+            body.mobile-menu-open { overflow:hidden; }
+            .main { margin-left:0; width:100%; }
+            .topbar { display:flex; justify-content:flex-start; padding:14px 16px; gap:12px; min-height:72px; }
+            .topbar h1 { font-size:18px; }
+            .page-heading { flex:1; }
+            .system { display:none; }
+            .content { padding:16px; }
+            .card { padding:16px; }
+            .filtros { padding:12px; }
+            .filtros .filtro, .filtros input, .filtros select { width:100%; min-width:0; }
+            .filtros .conteo { margin-left:0; }
+            .form-group input, .form-group select, .form-group textarea { max-width:100%; }
+        }
+        @media (max-width: 480px) {
+            .content { padding:12px; }
+            .topbar h1 { font-size:16px; }
+            .heading-kicker { font-size:9px; }
+            .card { padding:14px; }
+            .modal-acciones { flex-wrap:wrap; }
+        }
+        @media (prefers-reduced-motion:reduce) { .sidebar { transition:none; } }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/halloween.css') }}">
+    <link rel="stylesheet" href="/css/halloween.css?v=3">
     @stack('styles')
 </head>
 <body>
@@ -185,7 +230,8 @@ body{font-family:Inter,'Segoe UI',Arial,sans-serif;background:#f5f7fb;color:#182
         $rolActual = $usuarioActual?->rol?->nombre;
     @endphp
 
-    <aside class="sidebar">
+    <div class="mobile-backdrop" id="mobileBackdrop" aria-hidden="true"></div>
+    <aside class="sidebar" id="cofihoSidebar">
         <div class="brand"><span class="brand-symbol">C</span><span class="brand-word">COFIHO <em>V2</em><small>GESTIÓN AUTOMOTRIZ</small></span></div>
 
         <nav class="menu" aria-label="Menú principal"><div class="menu-caption">MENÚ PRINCIPAL</div>
@@ -237,6 +283,7 @@ body{font-family:Inter,'Segoe UI',Arial,sans-serif;background:#f5f7fb;color:#182
 
     <div class="main">
         <header class="topbar">
+            <button type="button" class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir menú" aria-controls="cofihoSidebar" aria-expanded="false">☰</button>
             <div class="page-heading"><span class="heading-kicker">COFIHO / PANEL DE CONTROL</span><h1>@yield('page-title', 'Panel de administración')</h1></div>
             <span class="system"><span class="system-dot"></span> Sistema de Gestión COFIHO</span>
         </header>
@@ -372,8 +419,26 @@ body{font-family:Inter,'Segoe UI',Arial,sans-serif;background:#f5f7fb;color:#182
         window.setTimeout(cerrar, Number(alerta.dataset.autoDismiss) || 5000);
     });
     </script>
+    <script>
+    (function () {
+        const toggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('cofihoSidebar');
+        const backdrop = document.getElementById('mobileBackdrop');
+        if (!toggle || !sidebar || !backdrop) return;
+        function setOpen(open) {
+            document.body.classList.toggle('mobile-menu-open', open);
+            toggle.setAttribute('aria-expanded', String(open));
+            toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+        }
+        toggle.addEventListener('click', () => setOpen(!document.body.classList.contains('mobile-menu-open')));
+        backdrop.addEventListener('click', () => setOpen(false));
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+        sidebar.querySelectorAll('nav a').forEach(a => a.addEventListener('click', () => setOpen(false)));
+        window.addEventListener('resize', () => { if (window.innerWidth > 768) setOpen(false); });
+    })();
+    </script>
     @stack('scripts')
 
-    <script src="{{ asset('js/halloween.js') }}" defer></script>
+    <script src="/js/halloween.js?v=3" defer></script>
 </body>
 </html>
